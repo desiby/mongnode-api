@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeapi
+  labels:
+    app: nodeapi
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nodeapi
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: nodeapi
+        tier: backend
+    spec:
+      containers:
+      - name: nodeapi
+        image: desiby/nodeapp:latest
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "128m"
+          limits:
+            memory: "128Mi"
+            cpu: "256m"
+        ports:
+        - containerPort: 3000
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeapi
+  labels:
+    app: nodeapi
+    tier: backend
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+  selector:
+    app: nodeapi
+    tier: backend
+  type: ClusterIP

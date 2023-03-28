@@ -1,0 +1,8 @@
+.gitgnore
+get.http
+post.http
+node_modules
+**/dist
+.git
+.vscode
+docker-compose.yml

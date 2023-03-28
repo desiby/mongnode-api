@@ -1,9 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://127.0.0.1:27017/customerapp"); //connect to database
 const bodyParser = require("body-parser");
 const user = require("./model/User");
+const PORT = process.env.NODE_DOCKER_PORT || 3000
+
+//connect to database using mongodb service name
+mongoose.connect("mongodb://mongo:27017/customerapp");
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -19,51 +23,41 @@ db.once("open", () =>{
     //Endpoints
     
     //get all users
-    app.get("/api", (req, res) =>{
-        user.find({},(err, docs) =>{
-            if (err) throw err;
-             res.json(docs);
-        });
+    app.get("/api", async(req, res) =>{
+        const users = await user.find();
+        res.json(users);
     });
 
     //get a user by id
-    app.get("/api/:id", (req, res) => {
-        user.findById(req.params.id, (err, doc) =>{
-            if(err) throw err;
-               res.json(doc);
-        });
+    app.get("/api/:id", async(req, res) => {
+        const users = await user.findById(req.params.id);
+        res.json(users);
     });
 
     //create new user
-    app.post("/api", (req, res) => {
-        user.create(req.body, (err) => {
-            if (err) throw err;
-               res.sendStatus(201);
-        });
+    app.post("/api", async(req, res) => {
+        const newUser = new user(req.body);
+        await newUser.save();
+        res.json(newUser);
     });
 
     //update user
-    app.put("/api/:id", (req, res) => {
-        user.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, doc) => {
-            if (err) throw err;
-                  res.json(doc);
-             });
+    app.put("/api/:id", async(req, res) => {
+        const updatedUser = await user.findByIdAndUpdate(req.params.id, req.body);
+        res.json(updatedUser);
     });
 
     //delete user
-    app.delete("/api/:id", (req, res) => {
-        user.findByIdAndRemove(req.params.id, (err) => {
-            if (err) throw err;
-              console.log(`user id ${req.params.id} removed!`)
-              res.sendStatus(200);
-        });
+    app.delete("/api/:id", async(req, res) => {
+        const deletedUser = await user.findByIdAndRemove(req.params.id);
+        res.json(deletedUser);
     });
 
 });
 
 //server
-app.listen(3000, () => {
-    console.log("Server started at port: 3000!!!");
+app.listen(PORT, () => {
+    console.log(`App Server is running on port ${PORT}`);
 });
 
 module.exports = app;

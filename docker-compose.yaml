@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  api:
+   image: nodeapp
+   ports:
+   - 3000:3000
+   container_name: node-api
+   restart: unless-stopped
+   networks:
+   - rest-api-app
+   depends_on:
+    - mongo
+
+  mongo:
+   image : mongo
+   ports:
+    - 27017:27017
+   container_name: mongodb
+   volumes:
+   - mongodb:/data/db
+   networks:
+   - rest-api-app
+      
+volumes:
+    mongodb:
+
+networks:
+  rest-api-app:
+    driver: bridge
