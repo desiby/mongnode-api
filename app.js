@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const user = require("./model/User");
 const PORT = process.env.NODE_DOCKER_PORT || 3000
 
-//connect to database using mongodb service name
+//connect to database using mongodb service name from compose or k8 definition file
 mongoose.connect("mongodb://mongo:27017/customerapp");
 
 
@@ -20,7 +20,6 @@ db.on("error", console.error.bind(console, "connection error"));
 db.once("open", () =>{
    
     console.log ("Connected to MongoDB yay!!!");
-    //Endpoints
     
     //get all users
     app.get("/api", async(req, res) =>{
